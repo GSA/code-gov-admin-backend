@@ -1,0 +1,26 @@
+{
+  "name": "code-gov-admin-tool-backend",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www NODE_ENV=production",
+    "test": "node ./bin/www NODE_ENV=test"
+  },
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "~1.17.1",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
+    "debug": "~2.6.3",
+    "ejs": "~2.5.6",
+    "express": "~4.15.2",
+    "jwt-simple": "^0.5.1",
+    "morgan": "~1.8.1",
+    "passport": "^0.3.2",
+    "passport-jwt": "^2.2.1",
+    "sequelize-transforms": "^1.0.0",
+    "serve-favicon": "~2.4.2",
+    "sqlite3": "^3.1.8"
+  }
+}
