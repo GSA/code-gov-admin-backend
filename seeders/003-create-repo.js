@@ -11,9 +11,14 @@ module.exports = {
       },
 
       name: { type: Sequelize.STRING, defaultValue: '' },
+      agency: { type: Sequelize.STRING, defaultValue: '' },
       organization: { type: Sequelize.STRING, defaultValue: '' }, 
-      description: { type: Sequelize.STRING, defaultValue: '' },
 
+      description: { type: Sequelize.STRING, defaultValue: '' },
+      schema_version: { type: Sequelize.STRING, defaultValue: '' },
+      measurement_method: { type: Sequelize.STRING, defaultValue: '' },
+      measurement_other_explanation: { type: Sequelize.STRING, defaultValue: '' },
+      
       status: { type: Sequelize.STRING, defaultValue: '' },
       license: { type: Sequelize.STRING, defaultValue: '' },
       vcs: { type: Sequelize.STRING, defaultValue: '' },
@@ -32,9 +37,15 @@ module.exports = {
       exemption: { type: Sequelize.STRING, defaultValue: '' },
       exemption_text: { type: Sequelize.STRING, defaultValue: '' },
 
-      partners: { type: Sequelize.JSON, defaultValue: {} },
+      disclaimer_text: { type: Sequelize.STRING, defaultValue: '' },
+      disclaimer_url: { type: Sequelize.STRING, defaultValue: '' },
+
+      partners: { type: Sequelize.JSON, defaultValue: [] },
       tags: { type: Sequelize.JSON, defaultValue: [] },
       languages: { type: Sequelize.JSON, defaultValue: [] },
+
+      partners: { type: Sequelize.JSON, defaultValue: [] },
+      related_code_bases: { type: Sequelize.JSON, defaultValue: [] },
 
       createdAt: {
         type: Sequelize.DATE,

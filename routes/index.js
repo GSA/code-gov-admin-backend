@@ -20,7 +20,7 @@ router.post("/token", function(req, res) {
     var password = req.body.password;
 
     Agency.findByEmail(email, function(err, agency) {
-      if (err !== null) {  res.sendStatus(401, 'Err: ' + err); }
+      if (err !== null) { res.sendStatus(401, 'Err: ' + err); }
       else if (!agency) { res.sendStatus(401, 'No agency'); }
       else if (agency.validPassword(password)) {
         var payload = { id: agency.id };
