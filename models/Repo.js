@@ -1,17 +1,19 @@
 
 module.exports = function(sequelize, DataTypes) {
 
-  var Repo = sequelize.define("Repo", {  
+  var Repo = sequelize.define("Repo", {
 
     name: { type: DataTypes.STRING },
-    organization: { type: DataTypes.STRING }, 
+    organization: { type: DataTypes.STRING },
     description: { type: DataTypes.STRING },
+    usage_type: { type: DataTypes.STRING },
+    version: { type: DataTypes.STRING },
+    labor_hours: { type: DataTypes.INTEGER },
 
     status: { type: DataTypes.STRING },
-    license: { type: DataTypes.STRING },
     vcs: { type: DataTypes.STRING },
-    reusable: { type: DataTypes.BOOLEAN },
-    open_source: { type: DataTypes.BOOLEAN },
+    disclaimer_url: { type: DataTypes.STRING },
+    disclaimer_text: { type: DataTypes.STRING },
 
     contact_name: { type: DataTypes.STRING },
     contact_email: { type: DataTypes.STRING },
@@ -28,10 +30,17 @@ module.exports = function(sequelize, DataTypes) {
     partners: { type: DataTypes.JSON },
     tags: { type: DataTypes.JSON },
     languages: { type: DataTypes.JSON },
+    licenses: { type: DataTypes.JSON },
+    related_code: { type: DataTypes.JSON },
+    reused_code: { type: DataTypes.JSON },
+
+    date_created: { type: DataTypes.STRING },
+    date_last_modified: { type: DataTypes.STRING },
+    date_metadata_last_updated: { type: DataTypes.STRING },
 
   });
 
-  Repo.associate = function(models) { 
+  Repo.associate = function(models) {
     Repo.belongsTo(models.Agency, {
       onDelete: "CASCADE",
       foreignKey: {
@@ -40,45 +49,31 @@ module.exports = function(sequelize, DataTypes) {
     });
   }
 
-  Repo.findById = function(id, completion) {
-    this.find({
+  Repo.findById = function(id) {
+    return this.find({
       where: { id: id }
-    }).then(function (repo) {
-      completion(null, repo);
-    }).catch(function(err) {
-      completion(err, null);
     });
   }
 
-  Repo.findByIdSimple = function(id, completion) {
-    this.find({
+  Repo.findByIdSimple = function(id) {
+    return this.find({
       where: { id: id },
       raw: true
-    }).then(function (repo) {
-      completion(null, repo);
-    }).catch(function(err) {
-      completion(err, null);
     });
   }
 
-  Repo.reposForUser = function(agencyId, completion, raw) {
-    this.findAll({
+  Repo.reposForUser = function(agencyId, raw) {
+    return this.findAll({
       where: { AgencyId: agencyId },
       raw: raw
-    }).then(function (repos) { 
-      completion(null, repos);
-    }).catch(function(err) {
-      completion(err, null);
     });
   }
 
-  Repo.updateProperties = function(id, properties, completion) {
-    this.update(properties, 
+  Repo.updateProperties = function(id, properties) {
+    return this.update(properties,
       { where: { id: id }}
     ).then(function (repo) {
-      Repo.findByIdSimple(id, completion); 
-    }).catch(function(err) {
-      completion(err, null);
+      return Repo.findByIdSimple(id);
     });
   }
 

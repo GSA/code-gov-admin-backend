@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var jwt = require("jwt-simple");
-var cfg = require("../config.json");
+var cfg = require("../config/config.json");
 var Agency = require('../models').Agency;
 var auth = require("../middleware/auth")();
 
@@ -14,31 +14,34 @@ router.get('/api-check', function(req, res, next) {
   res.json({ text: 'API Version 0.1'});
 });
 
-router.post("/token", function(req, res) {  
+router.post("/token", function(req, res) {
   if (req.body.email && req.body.password) {
     var email = req.body.email;
     var password = req.body.password;
 
-    Agency.findByEmail(email, function(err, agency) {
-      if (err !== null) { res.sendStatus(401, 'Err: ' + err); }
-      else if (!agency) { res.sendStatus(401, 'No agency'); }
-      else if (agency.validPassword(password)) {
-        var payload = { id: agency.id };
-        var token = jwt.encode(payload, cfg.jwt.secret);
+    Agency.findByEmail(email)
+      .then(function (agency) {
+        if (!agency) { res.sendStatus(401, 'No agency'); }
+        else if (agency.validPassword(password)) {
+          var payload = { id: agency.id };
+          var token = jwt.encode(payload, cfg.jwt.secret);
 
-        res.json({ agency: agency, token: token });
-      } else {
-        res.sendStatus(401, 'Invalid password');
-      }
-    });
+          res.json({ agency: agency, token: token });
+        } else {
+          res.sendStatus(401, 'Invalid password');
+        }
+      })
+      .catch(function (err) {
+        res.sendStatus(401, 'Err: ' + err);
+      });
   } else {
     res.sendStatus(401, 'Email and password must be set');
   }
 });
 
-router.post("/login-token", auth.validateToken(), function(req, res) { 
+router.post("/login-token", auth.validateToken(), function(req, res) {
   let agency = req.user;
-  delete agency.password; 
+  delete agency.password;
   res.json({agency: agency});
 });
 

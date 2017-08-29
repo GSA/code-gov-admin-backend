@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) { 
+  up: function (queryInterface, Sequelize) {
     return queryInterface.createTable('Repos', {
       id: {
         type: Sequelize.INTEGER,
@@ -12,18 +12,20 @@ module.exports = {
 
       name: { type: Sequelize.STRING, defaultValue: '' },
       agency: { type: Sequelize.STRING, defaultValue: '' },
-      organization: { type: Sequelize.STRING, defaultValue: '' }, 
+      organization: { type: Sequelize.STRING, defaultValue: '' },
+      usage_type: { type: Sequelize.STRING, defaultValue: '' },
+      version: { type: Sequelize.STRING, defaultValue: '' },
+      labor_hours: { type: Sequelize.INTEGER },
 
       description: { type: Sequelize.STRING, defaultValue: '' },
       schema_version: { type: Sequelize.STRING, defaultValue: '' },
       measurement_method: { type: Sequelize.STRING, defaultValue: '' },
       measurement_other_explanation: { type: Sequelize.STRING, defaultValue: '' },
-      
+
       status: { type: Sequelize.STRING, defaultValue: '' },
-      license: { type: Sequelize.STRING, defaultValue: '' },
       vcs: { type: Sequelize.STRING, defaultValue: '' },
-      reusable: { type: Sequelize.BOOLEAN, defaultValue: false },
-      open_source: { type: Sequelize.BOOLEAN, defaultValue: false },
+      disclaimer_url: { type: Sequelize.STRING, defaultValue: '' },
+      disclaimer_text: { type: Sequelize.STRING, defaultValue: '' },
 
       contact_name: { type: Sequelize.STRING, defaultValue: '' },
       contact_email: { type: Sequelize.STRING, defaultValue: '' },
@@ -45,7 +47,13 @@ module.exports = {
       languages: { type: Sequelize.JSON, defaultValue: [] },
 
       partners: { type: Sequelize.JSON, defaultValue: [] },
-      related_code_bases: { type: Sequelize.JSON, defaultValue: [] },
+      licenses: { type: Sequelize.JSON, defaultValue: [] },
+      related_code: { type: Sequelize.JSON, defaultValue: [] },
+      reused_code: { type: Sequelize.JSON, defaultValue: [] },
+
+      date_created: { type: Sequelize.STRING, defaultValue: '' },
+      date_last_modified: { type: Sequelize.STRING, defaultValue: '' },
+      date_metadata_last_updated: { type: Sequelize.STRING, defaultValue: '' },
 
       createdAt: {
         type: Sequelize.DATE,
