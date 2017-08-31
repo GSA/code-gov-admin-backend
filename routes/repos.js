@@ -3,14 +3,20 @@ var router = express.Router();
 var Repo = require('../models').Repo;
 var auth = require("../middleware/auth")();
 const { upgradeProject } = require('../utils/upgradeCodeJson');
+const _ = require('lodash');
+
+function parsed(entity) {
+  return JSON.parse(entity) || [];
+}
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  Repo.all({ plain: true })
+router.get('/', function(req, res) {
+  Repo.all({ raw: true })
     .then((repos) => {
-      console.log(repos);
+      res.setHeader('Content-disposition', 'attachment; filename=code.json');
+      res.setHeader('Content-Type', 'application/json');
 
-      return {
+      res.send(JSON.stringify({
         version: '2.0.0',
         measurementType: {
           method: '',
@@ -22,15 +28,12 @@ router.get('/', function(req, res, next) {
             repositoryURL: repo.repository_url,
             description: repo.description,
             permissions: {
-              licenses: [{
-                URL: '',
-                name: repo.license,
-              }],
-              usageType: '',
+              licenses: parsed(repo.licenses),
+              usageType: repo.usage_type,
               exemptionText: repo.exemption_text
             },
-            laborHours: null,
-            tags: JSON.parse(repo.tags).map(tag => tag.text),
+            laborHours: repo.labor_hours,
+            tags: parsed(repo.tags).map(tag => tag.text),
             contact: {
               email: repo.contact_email,
 
@@ -41,65 +44,30 @@ router.get('/', function(req, res, next) {
             },
 
             // optional
-            version: null,
+            version: repo.version,
             organization: repo.organization,
             status: repo.status,
             vcs: repo.vcs,
             homepageURL: repo.homepage_url,
             downloadURL: repo.download_url,
-            disclaimerText: '',
-            disclaimerURL: '',
-            languages: JSON.parse(repo.languages).map(language => language.text),
-            partners: JSON.parse(repo.partners).map(partner => ({
+            disclaimerText: repo.disclaimer_text,
+            disclaimerURL: repo.disclaimer_url,
+            languages: parsed(repo.languages).map(language => language.text),
+            partners: parsed(repo.partners).map(partner => ({
               name: partner.name,
               email: partner.email,
             })),
-            relatedCode: [{
-              codeName: '',
-              codeURL: '',
-              isGovernmentRepo: true,
-            }],
-            reusedCode: [{
-              name: '',
-              URL: '',
-            }],
+            relatedCode: parsed(repo.related_code),
+            reusedCode: parsed(repo.reused_code),
             date: {
-              created: '',
-              lastModified: '',
-              metadataLastUpdated: ''
+              created: repo.date_created,
+              lastModified: repo.date_last_modified,
+              metadataLastUpdated: repo.date_metadata_last_updated,
             },
           };
         })
-      }
+      }));
     });
-
-    /*
-    { id: 1,
-         name: 'GSA Demo',
-         organization: 'OFCIO',
-         description: 'This is a test',
-         status: 'Active',
-         license: 'MIT',
-         vcs: 'Bitbucket',
-         reusable: true,
-         open_source: false,
-         contact_name: 'Alvand Salehi',
-         contact_email: 'alvand@gmail.com',
-         contact_phone: '',
-         contact_url: '',
-         source_code_url: '',
-         homepage_url: '',
-         download_url: '',
-         exemption: '',
-         exemption_text: '',
-         partners: '[{"name":"Philip Bael","email":"philip@faa.gov"},{"name":"Matt Bailey","email":"matt@omb.gov"}]',
-         tags: '[{"id":1,"text":"test"},{"id":2,"text":"demo"},{"id":3,"text":"new"}]',
-         languages: '[{"id":1,"text":"java"},{"id":2,"text":"c++"}]',
-         createdAt: 2017-08-10T17:26:22.085Z,
-         updatedAt: 2017-08-10T17:28:33.080Z,
-         AgencyId: 2 },
-    */
-  res.json({ text: 'All repos listing'});
 });
 
 router.post("/add", auth.validateToken(), function(req, res) {
@@ -119,7 +87,7 @@ router.post("/delete", auth.validateToken(), function(req, res) {
   });
 });
 
-router.get('/raw/:repo', auth.validateToken(), function(req, res, next) {
+router.get('/raw/:repo', auth.validateToken(), function(req, res) {
   Repo.findByIdSimple(req.params.repo)
     .then(function(repo) {
       res.json(repo);
@@ -161,14 +129,18 @@ router.post("/add-json", auth.validateToken(), function(req, res) {
     if (version === '1.0.1') {
       console.log("Version 1.0.1");
 
-      org.releases = org.projects.map(upgradeProject);
-      delete org.projects;
+      if (Array.isArray(org.projects)) {
+        org.releases = org.projects.map(upgradeProject);
+        delete org.projects;
+      }
     } else if (version === '2.0.0') {
       console.log("Version 2.0.0");
     }
 
+    const releases = org.releases || [];
+
     allCreationObjects = allCreationObjects.concat(
-      org.releases.map(function (release) {
+      releases.map(function (release) {
         return {
           AgencyId: req.user.id,
           name: release.name,
@@ -184,20 +156,20 @@ router.post("/add-json", auth.validateToken(), function(req, res) {
           disclaimer_url: release.disclaimerURL,
           languages: release.languages,
           tags: release.tags,
-          contact_name: release.contact.name,
-          contact_email: release.contact.email,
-          contact_url: release.contact.URL,
-          contact_phone: release.contact.phone,
+          contact_name: _.get(release, 'contact.name'),
+          contact_email: _.get(release, 'contact.email'),
+          contact_url: _.get(release, 'contact.URL'),
+          contact_phone: _.get(release, 'contact.phone'),
           partners: release.partners,
           related_code: release.relatedCode,
           reused_code: release.reusedCode,
-          usage_type: release.permissions.usageType,
-          licenses: release.permissions.licenses,
-          exemption_text: release.permissions.exemption_text,
+          usage_type: _.get(release, 'permissions.usageType'),
+          licenses: _.get(release, 'permissions.licenses'),
+          exemption_text: _.get(release, 'permissions.exemption_text'),
           labor_hours: release.laborHours,
-          date_created: release.date.created,
-          date_last_modified: release.date.lastModified,
-          date_metadata_last_updated: release.date.metadataLastUpdated,
+          date_created: _.get(release, 'date.created'),
+          date_last_modified: _.get(release, 'date.lastModified'),
+          date_metadata_last_updated: _.get(release, 'date.metadataLastUpdated'),
         };
       }));
 

@@ -7,7 +7,6 @@ var auth = require("../middleware/auth")();
 router.get('/repos', auth.validateToken(), function(req, res, next) {
   Repo.reposForUser(req.user.id, true)
     .then(function (repos) {
-      console.log(repos);
       res.json({ repos });
     });
 });
