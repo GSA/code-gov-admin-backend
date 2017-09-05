@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  up: function (queryInterface, Sequelize) { 
+  up: function (queryInterface, Sequelize) {
     return queryInterface.createTable('Agencies', {
       id: {
         type: Sequelize.INTEGER,
@@ -29,8 +29,8 @@ module.exports = {
       contact_phone: { type: Sequelize.STRING, defaultValue: '' },
       contact_url: { type: Sequelize.STRING, defaultValue: '' },
 
-      source_code_url: { type: Sequelize.STRING, defaultValue: '' },
-      homepage_url: { type: Sequelize.STRING, defaultValue: '' },
+      measurement_type_method: { type: Sequelize.STRING, defaultValue: '' },
+      measurement_type_if_other: { type: Sequelize.STRING, defaultValue: '' },
 
       createdAt: {
         type: Sequelize.DATE,

@@ -5,15 +5,17 @@ var Repo = require('../models').Repo;
 var auth = require("../middleware/auth")();
 
 router.get('/repos', auth.validateToken(), function(req, res, next) {
-  Repo.reposForUser(req.user.id, function(err, repos) {
-    res.json({repos: repos});
-  }, true);
+  Repo.reposForUser(req.user.id, true)
+    .then(function (repos) {
+      res.json({ repos });
+    });
 });
 
-router.post("/update", auth.validateToken(), function(req, res) {  
-  Agency.updateProperties(req.user.id, req.body, function(err, agency) { 
-    res.json({agency: agency});
-  });
+router.post("/update", auth.validateToken(), function(req, res) {
+  Agency.updateProperties(req.user.id, req.body)
+    .then(function(agency) {
+      res.json({ agency });
+    });
 });
 
 module.exports = router;

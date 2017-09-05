@@ -2,7 +2,7 @@
 var Agency = require('../models/').Agency;
 
 module.exports = {
-  up: function (queryInterface, Sequelize) { 
+  up: function (queryInterface, Sequelize) {
     let agencies = [{
       email: 'omb',
       password: 'demo',
@@ -21,12 +21,12 @@ module.exports = {
       name: 'General Services Administration',
       acronym: 'GSA',
       logo_url: 'https://seeklogo.com/images/G/general-services-administration-gsa-logo-33F17F088F-seeklogo.com.png'
-    }]; 
+    }];
 
     return Agency.bulkCreate(agencies, {individualHooks: true});
   },
 
-  down: function (queryInterface, Sequelize) { 
-
+  down: function (queryInterface, Sequelize) {
+    return queryInterface.bulkDelete('agencies');
   }
 };
