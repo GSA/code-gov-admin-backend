@@ -77,13 +77,11 @@ module.exports = function(sequelize, DataTypes) {
     });
   }
 
-  Agency.updateProperties = function(id, properties, completion) {
-    this.update(properties,
+  Agency.updateProperties = function(id, properties) {
+    return this.update(properties,
       { where: { id: id }}
-    ).then(function (agency) {
-      return Agency.findByIdSimple(id, completion);
-    }).catch(function(err) {
-      completion(err, null);
+    ).then(function () {
+      return Agency.findByIdSimple(id);
     });
   }
 
